@@ -44,4 +44,17 @@ $r = undef;
 
 ok(!-d $dir, "Directory deleted");
 
+($r, $w) = Consumer::NonBlock->pair(batch_size => 5);
+$w->write_raw("foo");
+my $check;
+local $SIG{ALRM} = sub { die "ALARM" };
+alarm 1;
+ok(!eval { $check = $r->read_line(); 1 }, "timed out");
+like($@, qr/ALARM/, "got alarm");
+
+$w->write_raw('bar');
+$w->write_raw("baz\n");
+
+is($r->read_line(), "foobarbaz", "Buffered for complete line");
+
 done_testing;

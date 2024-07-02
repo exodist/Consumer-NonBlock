@@ -26,6 +26,7 @@ use Object::HashBase qw{
     +fh
     +batch
     +batch_item
+    +buffer
 };
 
 sub weaken { $_[0]->{+IS_WEAK} = 1 };
@@ -197,6 +198,22 @@ sub _batch_fh {
     return $self->{+FH} = $fh;
 }
 
+sub write_raw {
+    my $self = shift;
+    my ($raw) = @_;
+
+    croak "No data to write" unless defined $raw;
+
+    $self->_check_batch_boundary();
+    my $fh = $self->_batch_fh('>');
+
+    print $fh $raw;
+    $fh->flush();
+    $self->{+BATCH_ITEM}++;
+
+    return;
+}
+
 sub write_line {
     my $self = shift;
     my ($line) = @_;
@@ -217,6 +234,8 @@ sub write_line {
 sub read_line {
     my $self = shift;
 
+    my $buffer = \$self->{+BUFFER};
+
     my $loop = 0;
     while (1) {
         # There must be a better way, maybe INotify?
@@ -230,12 +249,21 @@ sub read_line {
         if ($fh = $self->_batch_fh('<')) {
             seek($fh, 0, 1) if $fh->eof;
             $line = <$fh>;
+            if (defined $line) {
+                unless (chomp($line)) {
+                    $$buffer = defined($$buffer) ? $$buffer . $line : $line;
+                    next;
+                }
+            }
         }
 
-
-        if ($fh && $line) {
+        if ($fh && defined $line) {
             $self->{+BATCH_ITEM}++;
-            chomp($line);
+            if ($$buffer) {
+                delete $self->{+BUFFER};
+                return $$buffer . $line if $$buffer;
+            }
+
             return $line;
         }
         else {
