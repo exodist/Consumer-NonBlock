@@ -2,7 +2,7 @@ package Consumer::NonBlock;
 use strict;
 use warnings;
 
-our $VERSION = "0.001";
+our $VERSION = '0.002';
 
 use IO::Handle;
 use File::Spec;
@@ -288,7 +288,7 @@ __END__
 
 =head1 NAME
 
-Consumer::NonBlock - Send data betwene processes without blocking.
+Consumer::NonBlock - Send data between processes without blocking.
 
 =head1 DESCRIPTION
 

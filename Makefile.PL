@@ -23,7 +23,7 @@ if ($ENV{AUTOMATED_TESTING}) {
 }
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Send data betwene processes without blocking.",
+  "ABSTRACT" => "Send data between processes without blocking.",
   "AUTHOR" => "Chad Granum <exodist\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000127"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
